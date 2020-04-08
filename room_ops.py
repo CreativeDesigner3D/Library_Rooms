@@ -514,8 +514,11 @@ class ROOM_OT_place_door(bpy.types.Operator):
         context.area.tag_redraw()
         return {'FINISHED'}
 
+classes = (
+    ROOM_OT_draw_molding,
+    ROOM_OT_draw_multiple_walls,
+    ROOM_OT_place_square_room,
+    ROOM_OT_place_door
+)
 
-bpy.utils.register_class(ROOM_OT_draw_molding)
-bpy.utils.register_class(ROOM_OT_draw_multiple_walls)
-bpy.utils.register_class(ROOM_OT_place_square_room)
-bpy.utils.register_class(ROOM_OT_place_door)
+register, unregister = bpy.utils.register_classes_factory(classes)      

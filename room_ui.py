@@ -131,6 +131,10 @@ class ROOM_OT_room_prompts(bpy.types.Operator):
         wall_thickness.draw(layout)
 
 
-bpy.utils.register_class(ROOM_PT_library_settings)
-bpy.utils.register_class(ROOM_OT_wall_prompts)
-bpy.utils.register_class(ROOM_OT_room_prompts)        
+classes = (
+    ROOM_PT_library_settings,
+    ROOM_OT_wall_prompts,
+    ROOM_OT_room_prompts
+)
+
+register, unregister = bpy.utils.register_classes_factory(classes)        

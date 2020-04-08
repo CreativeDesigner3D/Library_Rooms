@@ -72,10 +72,11 @@ class Room_Scene_Props(PropertyGroup):
     def unregister(cls):
         del bpy.types.Scene.room
 
-bpy.utils.register_class(Room_Scene_Props)
+# def register():
+#     bpy.utils.register_class(Room_Scene_Props)
 
-# classes = (
-#     Room_Scene_Props,
-# )
+classes = (
+    Room_Scene_Props,
+)
 
-# register, unregister = bpy.utils.register_classes_factory(classes)        
+register, unregister = bpy.utils.register_classes_factory(classes)        
