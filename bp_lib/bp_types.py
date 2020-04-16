@@ -162,6 +162,20 @@ class Assembly:
                 assembly.obj_bp.parent = self.obj_bp
         return assembly
 
+    def add_assembly_from_file(self,filepath):
+        with bpy.data.libraries.load(filepath, False, False) as (data_from, data_to):
+            data_to.objects = data_from.objects
+
+        obj_bp = None
+
+        for obj in data_to.objects:
+            if not obj.parent:
+                obj_bp = obj
+            bpy.context.view_layer.active_layer_collection.collection.objects.link(obj)
+
+        obj_bp.parent = self.obj_bp
+        return obj_bp
+
     def add_cube(self,name,obj_bp,obj_x,obj_y,obj_z):
         pass
 

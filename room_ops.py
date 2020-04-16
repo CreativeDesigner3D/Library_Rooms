@@ -397,7 +397,12 @@ class ROOM_OT_place_door(bpy.types.Operator):
 
     def set_placed_properties(self,obj):
         if obj.type == 'MESH':
-            obj.display_type = 'TEXTURED'          
+            if 'IS_BOOLEAN' in obj:
+                obj.display_type = 'WIRE' 
+                obj.hide_viewport = True
+            else:
+                obj.display_type = 'TEXTURED'  
+
         for child in obj.children:
             self.set_placed_properties(child) 
 
@@ -441,6 +446,7 @@ class ROOM_OT_place_door(bpy.types.Operator):
 
         if self.event_is_place_first_point(event):
             self.add_boolean_modifier(selected_obj)
+            self.set_placed_properties(self.door.obj_bp)
             if selected_obj.parent:
                 self.parent_door_to_wall(selected_obj.parent)
             self.create_door()
