@@ -138,11 +138,17 @@ class Assembly:
         self.obj_prompts["obj_prompts"] = True
         self.coll.objects.link(self.obj_prompts)
 
+    def add_prompt(self,name,prompt_type,value):
+        prompt = self.obj_prompts.prompt_page.add_prompt(prompt_type,name)
+        prompt.set_value(value)
+        return prompt
+
     def add_empty(self,obj_name):
         obj = bpy.data.objects.new(obj_name,None)
+        bpy.context.view_layer.active_layer_collection.collection.objects.link(obj)
         obj.location = (0,0,0)
         obj.parent = self.obj_bp
-        self.coll.objects.link(obj)
+        # self.coll.objects.link(obj)
         return obj
 
     def add_object(self,obj):
@@ -185,6 +191,14 @@ class Assembly:
     def get_prompt(self,name):
         if name in self.obj_prompts.prompt_page.prompts:
             return self.obj_prompts.prompt_page.prompts[name]
+        
+        for calculator in self.obj_prompts.prompt_page.calculators:
+            if name in calculator.prompts:
+                return calculator.prompts[name]
+
+    def get_calculator(self,name):
+        if name in self.obj_prompts.prompt_page.calculators:
+            return self.obj_prompts.prompt_page.calculators[name]
 
     def loc_x(self,expression="",variables=[],value=0):
         if expression == "":
