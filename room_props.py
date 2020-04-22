@@ -49,11 +49,11 @@ class Room_Scene_Props(PropertyGroup):
             box.label(text="General Room Tools",icon='MOD_BUILD')   
             box.operator('room.draw_molding',text="Auto Add Base Molding")
             box.operator('room.draw_molding',text="Auto Add Crown Molding")              
-            box.operator('room.draw_molding',text="Add Floor")
+            box.operator('room.draw_floor_plane',text="Add Floor")
 
             box = col.box()
             box.label(text="Room Lighting Tools",icon='MOD_BUILD')  
-            box.operator('room.draw_molding',text="Add Room Light")
+            box.operator('room.add_room_light',text="Add Room Light")
 
             box = col.box()
             box.label(text="2D Drawing Tools",icon='MOD_BUILD')  

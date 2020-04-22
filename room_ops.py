@@ -166,16 +166,21 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
     def set_end_angles(self):
         if self.previous_wall and self.current_wall:
             left_angle = self.current_wall.get_prompt("Left Angle")
-            # right_angle = self.current_wall.get_prompt("Right Angle")    
-
-            # prev_left_angle = self.previous_wall.get_prompt("Left Angle")
             prev_right_angle = self.previous_wall.get_prompt("Right Angle") 
 
             prev_rot = self.previous_wall.obj_bp.rotation_euler.z  
             rot = self.current_wall.obj_bp.rotation_euler.z
 
-            left_angle.set_value((rot-prev_rot)/2)
-            prev_right_angle.set_value((prev_rot-rot)/2)
+            current_rot = round(math.degrees(rot),0)
+            previous_rot = round(math.degrees(prev_rot),0)
+            diff = int(math.fabs(current_rot-previous_rot))
+
+            if diff == 0 or diff == 180:
+                left_angle.set_value(0)
+                prev_right_angle.set_value(0)
+            else:
+                left_angle.set_value((rot-prev_rot)/2)
+                prev_right_angle.set_value((prev_rot-rot)/2)
 
             self.current_wall.obj_prompts.location = self.current_wall.obj_prompts.location
             self.previous_wall.obj_prompts.location = self.previous_wall.obj_prompts.location            
@@ -520,11 +525,151 @@ class ROOM_OT_place_door(bpy.types.Operator):
         context.area.tag_redraw()
         return {'FINISHED'}
 
+
+class ROOM_OT_draw_floor_plane(bpy.types.Operator):
+    bl_idname = "room.draw_floor_plane"
+    bl_label = "Draw Floor Plane"
+    bl_options = {'UNDO'}
+    
+    def create_floor_mesh(self,name,size):
+        
+        verts = [(0.0, 0.0, 0.0),
+                (0.0, size[1], 0.0),
+                (size[0], size[1], 0.0),
+                (size[0], 0.0, 0.0),
+                ]
+
+        faces = [(0, 1, 2, 3),
+                ]
+
+        return bp_utils.create_object_from_verts_and_faces(verts,faces,name)
+
+    def execute(self, context):
+        largest_x = 0
+        largest_y = 0
+        smallest_x = 0
+        smallest_y = 0
+        wall_assemblies = []
+        wall_bps = []
+        for obj in context.visible_objects:
+            if obj.parent and 'IS_WALL_BP' in obj.parent and obj.parent not in wall_bps:
+                wall_bps.append(obj.parent)
+                wall_assemblies.append(bp_types.Assembly(obj.parent))
+            
+        for assembly in wall_assemblies:
+            start_point = (assembly.obj_bp.matrix_world[0][3],assembly.obj_bp.matrix_world[1][3],0)
+            end_point = (assembly.obj_x.matrix_world[0][3],assembly.obj_x.matrix_world[1][3],0)
+
+            if start_point[0] > largest_x:
+                largest_x = start_point[0]
+            if start_point[1] > largest_y:
+                largest_y = start_point[1]
+            if start_point[0] < smallest_x:
+                smallest_x = start_point[0]
+            if start_point[1] < smallest_y:
+                smallest_y = start_point[1]
+            if end_point[0] > largest_x:
+                largest_x = end_point[0]
+            if end_point[1] > largest_y:
+                largest_y = end_point[1]
+            if end_point[0] < smallest_x:
+                smallest_x = end_point[0]
+            if end_point[1] < smallest_y:
+                smallest_y = end_point[1]
+
+        loc = (smallest_x , smallest_y,0)
+        width = math.fabs(smallest_y) + math.fabs(largest_y)
+        length = math.fabs(largest_x) + math.fabs(smallest_x)
+        if width == 0:
+            width = unit.inch(-48)
+        if length == 0:
+            length = unit.inch(-48)
+        obj_plane = self.create_floor_mesh('Floor',(length,width,0.0))
+        context.view_layer.active_layer_collection.collection.objects.link(obj_plane)
+        obj_plane.location = loc
+        
+        bpy.ops.object.select_all(action='DESELECT')
+
+        #SET CONTEXT
+        context.view_layer.objects.active = obj_plane
+        
+        return {'FINISHED'}
+
+
+class ROOM_OT_add_room_light(bpy.types.Operator):
+    bl_idname = "room.add_room_light"
+    bl_label = "Add Room Light"
+    bl_options = {'UNDO'}
+    
+    def execute(self, context):
+        largest_x = 0
+        largest_y = 0
+        smallest_x = 0
+        smallest_y = 0
+        wall_groups = []
+        height = 0
+        # for obj in context.visible_objects:
+        #     if obj.mv.type == 'BPWALL':
+        #         wall_groups.append(fd_types.Wall(obj))
+            
+        wall_assemblies = []
+        wall_bps = []
+        for obj in context.visible_objects:
+            if obj.parent and 'IS_WALL_BP' in obj.parent and obj.parent not in wall_bps:
+                wall_bps.append(obj.parent)
+                wall_assemblies.append(bp_types.Assembly(obj.parent))
+
+        for assembly in wall_assemblies:
+            start_point = (assembly.obj_bp.matrix_world[0][3],assembly.obj_bp.matrix_world[1][3],0)
+            end_point = (assembly.obj_x.matrix_world[0][3],assembly.obj_x.matrix_world[1][3],0)
+            height = assembly.obj_z.location.z
+            
+            if start_point[0] > largest_x:
+                largest_x = start_point[0]
+            if start_point[1] > largest_y:
+                largest_y = start_point[1]
+            if start_point[0] < smallest_x:
+                smallest_x = start_point[0]
+            if start_point[1] < smallest_y:
+                smallest_y = start_point[1]
+            if end_point[0] > largest_x:
+                largest_x = end_point[0]
+            if end_point[1] > largest_y:
+                largest_y = end_point[1]
+            if end_point[0] < smallest_x:
+                smallest_x = end_point[0]
+            if end_point[1] < smallest_y:
+                smallest_y = end_point[1]
+
+        x = (math.fabs(largest_x) - math.fabs(smallest_x))/2
+        y = (math.fabs(largest_y) - math.fabs(smallest_y))/2
+        z = height - bp_unit.inch(.01)
+        
+        width = math.fabs(smallest_y) + math.fabs(largest_y)
+        length = math.fabs(largest_x) + math.fabs(smallest_x)
+        if width == 0:
+            width = bp_unit.inch(-48)
+        if length == 0:
+            length = bp_unit.inch(-48)
+
+        bpy.ops.object.light_add(type = 'AREA')
+        obj_lamp = context.active_object
+        obj_lamp.location.x = x
+        obj_lamp.location.y = y
+        obj_lamp.location.z = z
+        obj_lamp.data.shape = 'RECTANGLE'
+        obj_lamp.data.size = length + bp_unit.inch(20)
+        obj_lamp.data.size_y = math.fabs(width) + bp_unit.inch(20)
+        obj_lamp.data.energy = max(bp_unit.meter_to_active_unit(largest_x),bp_unit.meter_to_active_unit(largest_y))/4
+        return {'FINISHED'}
+
 classes = (
     ROOM_OT_draw_molding,
     ROOM_OT_draw_multiple_walls,
     ROOM_OT_place_square_room,
-    ROOM_OT_place_door
+    ROOM_OT_place_door,
+    ROOM_OT_draw_floor_plane,
+    ROOM_OT_add_room_light
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)      
