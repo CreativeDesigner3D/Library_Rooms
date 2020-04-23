@@ -19,7 +19,7 @@ class Door(room_types.Door):
         boolean_overhang.set_value(bp_unit.inch(1))
 
         self.obj_x.location.x = bp_unit.inch(36) #Length
-        self.obj_y.location.y = bp_unit.inch(6) #Depth
+        self.obj_y.location.y = bp_unit.inch(6)  #Depth
         self.obj_z.location.z = bp_unit.inch(70)
 
         width = self.obj_x.drivers.get_var('location.x','width')
@@ -47,6 +47,4 @@ class Door(room_types.Door):
         door_frame.loc_z(value=0)
         door_frame.dim_x('width',[width])
         door_frame.dim_y('depth',[depth])
-        door_frame.dim_z('height',[height])        
-
-        
+        door_frame.dim_z('height',[height])  

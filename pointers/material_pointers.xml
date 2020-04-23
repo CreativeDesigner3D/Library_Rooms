@@ -1,9 +1,14 @@
 <?xml version="1.0" ?>
 <Root Application="Blender" ApplicationVersion="0.1">
 	<Pointer>
-		<Name>Wall Material</Name>
+		<Name>Walls</Name>
 		<Category>Wall Paint</Category>
 		<Asset>-Textured Paint - Cream</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Floor</Name>
+		<Category>Wood Flooring</Category>
+		<Asset>Natural Anagre Hardwood</Asset>
 	</Pointer>
 	<Pointer>
 		<Name>Door Trim</Name>

@@ -36,8 +36,19 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
 
     obj_wall_meshes = []
 
-    def execute(self, context):
+    def reset_properties(self):
+        self.drawing_plane = None
+        self.current_wall = None
+        self.previous_wall = None
         self.starting_point = ()
+        self.assembly = None
+        self.obj = None
+        self.exclude_objects = []
+        self.class_name = ""
+        self.obj_wall_meshes = []        
+
+    def execute(self, context):
+        self.reset_properties()
         self.get_class_name()
         self.create_drawing_plane(context)
         self.create_wall()
@@ -53,6 +64,7 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
         props = room_utils.get_room_scene_props(bpy.context)
         wall = eval("data_walls." + self.class_name + "()")
         wall.draw_wall()
+        room_utils.assign_wall_pointers(wall)
         if self.current_wall:
             self.previous_wall = self.current_wall
         self.current_wall = wall
@@ -62,8 +74,6 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
         self.set_child_properties(self.current_wall.obj_bp)
 
     def connect_walls(self):
-        # self.current_wall.obj_bp.parent = self.previous_wall.obj_x
-
         constraint_obj = self.previous_wall.obj_x
         constraint = self.current_wall.obj_bp.constraints.new('COPY_LOCATION')
         constraint.target = constraint_obj
@@ -216,7 +226,6 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
 
         for obj in self.obj_wall_meshes:
             room_utils.unwrap_obj(context,obj)
-            #ASSIGN MATERIAL
 
         obj_list = []
         obj_list.append(self.drawing_plane)
@@ -548,6 +557,7 @@ class ROOM_OT_draw_floor_plane(bpy.types.Operator):
         largest_y = 0
         smallest_x = 0
         smallest_y = 0
+        overhang = bp_unit.inch(6)
         wall_assemblies = []
         wall_bps = []
         for obj in context.visible_objects:
@@ -576,17 +586,21 @@ class ROOM_OT_draw_floor_plane(bpy.types.Operator):
             if end_point[1] < smallest_y:
                 smallest_y = end_point[1]
 
-        loc = (smallest_x , smallest_y,0)
-        width = math.fabs(smallest_y) + math.fabs(largest_y)
-        length = math.fabs(largest_x) + math.fabs(smallest_x)
+        loc = (smallest_x - overhang, smallest_y - overhang,0)
+        width = math.fabs(smallest_y) + math.fabs(largest_y) + (overhang*2)
+        length = math.fabs(largest_x) + math.fabs(smallest_x) + (overhang*2)
         if width == 0:
-            width = unit.inch(-48)
+            width = bp_unit.inch(-48)
         if length == 0:
-            length = unit.inch(-48)
+            length = bp_unit.inch(-48)
         obj_plane = self.create_floor_mesh('Floor',(length,width,0.0))
         context.view_layer.active_layer_collection.collection.objects.link(obj_plane)
         obj_plane.location = loc
-        
+        room_utils.unwrap_obj(context,obj_plane)
+        room_utils.assign_floor_pointers(obj_plane)
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.mesh.flip_normals()
+        bpy.ops.object.editmode_toggle()
         bpy.ops.object.select_all(action='DESELECT')
 
         #SET CONTEXT

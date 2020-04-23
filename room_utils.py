@@ -53,7 +53,8 @@ def get_material(category,material_name):
 
 def get_default_material_pointers():
     pointers = []
-    pointers.append(("Wall Material","Wall Paint","-Textured Paint - Cream"))
+    pointers.append(("Walls","Wall Paint","-Textured Paint - Cream"))
+    pointers.append(("Floor","Wood Flooring","Natural Anagre Hardwood"))
     pointers.append(("Door Trim","Plastic","White Melamine"))
     pointers.append(("Door Panels","Plastic","White Melamine"))
     pointers.append(("Window Trim","Plastic","White Melamine"))
@@ -93,3 +94,28 @@ def update_pointer_properties():
                                                 props.material_pointers)
     # bp_pointer_utils.update_props_from_xml_file(get_handle_pointer_xml_path(),
     #                                             props.pull_pointers)
+
+def assign_wall_pointers(assembly):
+    for child in assembly.obj_bp.children:
+        if child.type == 'MESH':
+            if len(child.material_slots) == 0:
+                bpy.ops.bp_material.add_material_slot(object_name=child.name)
+            for index, pointer in enumerate(child.material_pointer.slots):  
+                pointer.name = "Walls"  
+            assign_materials_to_object(child)
+
+def assign_floor_pointers(obj):
+    if len(obj.material_slots) == 0:
+        bpy.ops.bp_material.add_material_slot(object_name=obj.name)
+    for index, pointer in enumerate(obj.material_pointer.slots):  
+        pointer.name = "Floor"  
+    assign_materials_to_object(obj)
+
+def assign_materials_to_object(obj):
+    props = get_room_scene_props(bpy.context)
+    for index, pointer in enumerate(obj.material_pointer.slots):
+        if index <= len(obj.material_slots) and pointer.name in props.material_pointers:
+            p = props.material_pointers[pointer.name]
+            slot = obj.material_slots[index]
+            slot.material = get_material(p.category,p.item_name)                
+
