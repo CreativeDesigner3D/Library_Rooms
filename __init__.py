@@ -9,6 +9,7 @@ from . import data_walls
 from . import data_windows
 from . import room_ops
 from . import room_ui
+from . import room_utils
 from bpy.app.handlers import persistent
 
 bl_info = {
@@ -40,6 +41,11 @@ def load_library_on_file_load(scene=None):
         bp_utils.load_library_items_from_module(lib,data_doors)
         bp_utils.load_library_items_from_module(lib,data_windows)
 
+@persistent
+def load_pointers(scene=None):
+    room_utils.write_pointer_files()
+    room_utils.update_pointer_properties()
+
 def register():
     room_props.register()
     room_ops.register()
@@ -47,6 +53,7 @@ def register():
 
     load_library_on_file_load()
     bpy.app.handlers.load_post.append(load_library_on_file_load)
+    bpy.app.handlers.load_post.append(load_pointers)
 
 def unregister():
     room_props.unregister()
@@ -54,6 +61,7 @@ def unregister():
     room_ui.unregister()    
 
     bpy.app.handlers.load_post.remove(load_library_on_file_load)  
+    bpy.app.handlers.load_post.remove(load_pointers)
 
     for i, lib in enumerate(bpy.context.window_manager.bp_lib.script_libraries):
         if lib.name == "Room Library":

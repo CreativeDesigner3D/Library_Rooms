@@ -6,7 +6,7 @@ class ROOM_PT_library_settings(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
     bl_label = "Library"
     bl_region_type = 'HEADER'
-    bl_ui_units_x = 18
+    bl_ui_units_x = 32
 
     def draw(self, context):
         layout = self.layout

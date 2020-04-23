@@ -34,6 +34,8 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
 
     class_name = ""
 
+    obj_wall_meshes = []
+
     def execute(self, context):
         self.starting_point = ()
         self.get_class_name()
@@ -86,7 +88,8 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
 
     def set_placed_properties(self,obj):
         if obj.type == 'MESH':
-            obj.display_type = 'TEXTURED'          
+            obj.display_type = 'TEXTURED'   
+            self.obj_wall_meshes.append(obj)
         for child in obj.children:
             self.set_placed_properties(child) 
 
@@ -211,6 +214,10 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
             prev_right_angle = self.previous_wall.get_prompt("Right Angle") 
             prev_right_angle.set_value(0)
 
+        for obj in self.obj_wall_meshes:
+            room_utils.unwrap_obj(context,obj)
+            #ASSIGN MATERIAL
+
         obj_list = []
         obj_list.append(self.drawing_plane)
         obj_list.append(self.current_wall.obj_bp)
@@ -218,14 +225,6 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
             obj_list.append(child)
         bp_utils.delete_obj_list(obj_list)
         return {'CANCELLED'}
-
-    def finish(self,context):
-        context.window.cursor_set('DEFAULT')
-        if self.drawing_plane:
-            bp_utils.delete_obj_list([self.drawing_plane])
-        bpy.ops.object.select_all(action='DESELECT')
-        context.area.tag_redraw()
-        return {'FINISHED'}
 
 
 class ROOM_OT_place_square_room(bpy.types.Operator):
@@ -663,13 +662,37 @@ class ROOM_OT_add_room_light(bpy.types.Operator):
         obj_lamp.data.energy = max(bp_unit.meter_to_active_unit(largest_x),bp_unit.meter_to_active_unit(largest_y))/4
         return {'FINISHED'}
 
+
+class ROOM_OT_update_scene_materials(bpy.types.Operator):
+    bl_idname = "room.update_scene_materials"
+    bl_label = "Update Scene Materials"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+
+        return {'FINISHED'}
+
+
+class ROOM_OT_update_material_pointer(bpy.types.Operator):
+    bl_idname = "room.update_material_pointer"
+    bl_label = "Update Material Pointer"
+    bl_options = {'UNDO'}
+
+    pointer_name: bpy.props.StringProperty(name="Pointer Name",default="")
+
+    def execute(self, context):
+
+        return {'FINISHED'}
+
 classes = (
     ROOM_OT_draw_molding,
     ROOM_OT_draw_multiple_walls,
     ROOM_OT_place_square_room,
     ROOM_OT_place_door,
     ROOM_OT_draw_floor_plane,
-    ROOM_OT_add_room_light
+    ROOM_OT_add_room_light,
+    ROOM_OT_update_scene_materials,
+    ROOM_OT_update_material_pointer
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)      

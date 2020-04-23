@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Root Application="Blender" ApplicationVersion="0.1">
+	<Pointer>
+		<Name>Door Handles</Name>
+		<Category>Decorative Pulls</Category>
+		<Asset>Americana Handle</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Window Handles</Name>
+		<Category>Decorative Pulls</Category>
+		<Asset>Americana Handle</Asset>
+	</Pointer>
+</Root>

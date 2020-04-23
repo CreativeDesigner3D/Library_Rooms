@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<Root Application="Blender" ApplicationVersion="0.1">
+	<Pointer>
+		<Name>Wall Material</Name>
+		<Category>Wall Paint</Category>
+		<Asset>-Textured Paint - Cream</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Door Trim</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Door Panels</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Window Trim</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Window</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Pull Finish</Name>
+		<Category>Metal</Category>
+		<Asset>Polished Chrome</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Glass</Name>
+		<Category>Misc</Category>
+		<Asset>Glass</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Base Molding</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+	<Pointer>
+		<Name>Crown Molding</Name>
+		<Category>Plastic</Category>
+		<Asset>White Melamine</Asset>
+	</Pointer>
+</Root>
