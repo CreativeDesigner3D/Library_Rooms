@@ -64,6 +64,7 @@ class ROOM_OT_draw_multiple_walls(bpy.types.Operator):
         props = room_utils.get_room_scene_props(bpy.context)
         wall = eval("data_walls." + self.class_name + "()")
         wall.draw_wall()
+        wall.set_name("Wall")
         room_utils.assign_wall_pointers(wall)
         if self.current_wall:
             self.previous_wall = self.current_wall
@@ -428,14 +429,20 @@ class ROOM_OT_place_door(bpy.types.Operator):
         self.drawing_plane.dimensions = (100,100,1)
 
     def get_boolean_obj(self,obj):
-        if 'IS_BOOLEAN' in obj and obj['IS_BOOLEAN'] == True:
+        #TODO FIGURE OUT HOW TO DO RECURSIVE SEARCHING 
+        #ONLY SERACHES THREE LEVELS DEEP :(
+        if 'IS_BOOLEAN' in obj:
             return obj
         for child in obj.children:
-            return self.get_boolean_obj(child)
+            if 'IS_BOOLEAN' in child:
+                return child
+            for nchild in child.children:
+                if 'IS_BOOLEAN' in nchild:
+                    return nchild
 
     def add_boolean_modifier(self,wall_mesh):
         obj_bool = self.get_boolean_obj(self.door.obj_bp)
-        if wall_mesh:
+        if wall_mesh and obj_bool:
             mod = wall_mesh.modifiers.new(obj_bool.name,'BOOLEAN')
             mod.object = obj_bool
             mod.operation = 'DIFFERENCE'
@@ -517,12 +524,8 @@ class ROOM_OT_place_door(bpy.types.Operator):
                 self.door.obj_bp.location.z = 0
 
     def cancel_drop(self,context):
-        obj_list = []
-        obj_list.append(self.drawing_plane)
-        obj_list.append(self.door.obj_bp)
-        for child in self.door.obj_bp.children:
-            obj_list.append(child)
-        bp_utils.delete_obj_list(obj_list)
+        bp_utils.delete_object_and_children(self.door.obj_bp)
+        bp_utils.delete_object_and_children(self.drawing_plane)
         return {'CANCELLED'}
 
     def finish(self,context):

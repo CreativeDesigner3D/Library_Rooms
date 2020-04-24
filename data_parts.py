@@ -25,7 +25,7 @@ class Cube(room_types.Part):
         #When assigning vertices to a hook the transformation is made so the size must be 0
         # size = (self.obj_x.location.x,self.obj_y.location.y,self.obj_z.location.z)
         size = (0,0,0)
-        obj_mesh = bp_utils.create_cube_mesh("Bottom Plate",size)
+        obj_mesh = bp_utils.create_cube_mesh("Cube",size)
         self.add_object(obj_mesh)
 
         vgroup = obj_mesh.vertex_groups[self.obj_x.name]

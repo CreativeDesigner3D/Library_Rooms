@@ -104,6 +104,24 @@ def assign_wall_pointers(assembly):
                 pointer.name = "Walls"  
             assign_materials_to_object(child)
 
+def assign_door_frame_pointers(assembly):
+    for child in assembly.obj_bp.children:
+        if child.type == 'MESH':
+            if len(child.material_slots) == 0:
+                bpy.ops.bp_material.add_material_slot(object_name=child.name)
+            for index, pointer in enumerate(child.material_pointer.slots):  
+                pointer.name = "Door Trim"  
+            assign_materials_to_object(child)
+
+def assign_door_panel_pointers(assembly):
+    for child in assembly.obj_bp.children:
+        if child.type == 'MESH':
+            if len(child.material_slots) == 0:
+                bpy.ops.bp_material.add_material_slot(object_name=child.name)
+            for index, pointer in enumerate(child.material_pointer.slots):  
+                pointer.name = "Door Panels"  
+            assign_materials_to_object(child)
+
 def assign_floor_pointers(obj):
     if len(obj.material_slots) == 0:
         bpy.ops.bp_material.add_material_slot(object_name=obj.name)
